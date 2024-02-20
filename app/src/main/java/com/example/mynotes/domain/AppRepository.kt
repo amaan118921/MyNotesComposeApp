@@ -17,6 +17,10 @@ interface AppRepository {
         noteEntity: NoteEntity
     )
 
+    suspend fun fetchNoteWithId(
+        id:Int
+    ): NoteEntity
+
     fun fetchNotesWithQuery(
         query: String
     ): Flow<List<NoteEntity>>

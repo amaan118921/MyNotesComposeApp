@@ -1,10 +1,17 @@
 package com.example.mynotes.room
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import com.example.mynotes.model.NoteModel
+import com.example.mynotes.model.Photo
+import com.example.mynotes.room.converters.RoomConverter
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity("notes")
 data class NoteEntity(
     @PrimaryKey(autoGenerate = true)
@@ -20,9 +27,12 @@ data class NoteEntity(
     @ColumnInfo
     var date: String,
     @ColumnInfo
-    var isEdited: Boolean = false
+    var isEdited: Boolean = false,
+    @ColumnInfo
+    @TypeConverters(RoomConverter::class)
+    var photoList: List<Photo>
 
-) {
+) : Parcelable {
     override fun equals(other: Any?): Boolean {
         if (other !is NoteEntity) {
             return false
@@ -48,6 +58,6 @@ data class NoteEntity(
 
 fun NoteEntity.toNoteModel(): NoteModel {
     return NoteModel(
-        id, title, body, time = time, date = date, timestamp = timestamp, isEdited = isEdited
+        id, title, body, time = time, date = date, timestamp = timestamp, isEdited = isEdited, photoList = photoList
     )
 }

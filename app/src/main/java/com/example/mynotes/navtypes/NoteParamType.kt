@@ -1,11 +1,11 @@
-package com.example.mynotes
+package com.example.mynotes.navtypes
 
 import android.os.Bundle
 import androidx.navigation.NavType
 import com.example.mynotes.model.NoteModel
 import com.google.gson.Gson
 
-class AssetParamType : NavType<NoteModel>(isNullableAllowed = false) {
+class NoteParamType : NavType<NoteModel>(isNullableAllowed = false) {
     override fun get(bundle: Bundle, key: String): NoteModel? {
         return bundle.getParcelable(key)
     }

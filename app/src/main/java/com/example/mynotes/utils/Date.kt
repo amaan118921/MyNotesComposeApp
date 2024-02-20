@@ -11,7 +11,17 @@ fun getTime(): String {
 
 fun getDate(): String {
     val pattern = "dd MMMM yyyy"
-    return getDateFormat(pattern = pattern).format(Calendar.getInstance().timeInMillis)
+    val date = getDateFormat(pattern = pattern).format(Calendar.getInstance().timeInMillis)
+    return parseToDateFormat(date)
+}
+
+fun parseToDateFormat(date: String): String {
+    val arr = date.split(" ")
+    if (arr.size < 3) return date
+    return arr[1] + " " + arr[0].append(",") + " " + arr[2]
+}
+fun String.append(string: String): String {
+    return this + string
 }
 
 @SuppressLint("SimpleDateFormat")

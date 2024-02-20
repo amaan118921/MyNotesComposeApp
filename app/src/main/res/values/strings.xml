@@ -7,4 +7,5 @@
     <string name="update">Update</string>
     <string name="edited">Edited</string>
     <string name="title_activity_search_screen">SearchScreenActivity</string>
+    <string name="authorities">com.example.mynotes.fileprovider</string>
 </resources>

@@ -23,6 +23,9 @@ interface AppDao {
     @Query("SELECT * from notes")
     fun fetchAllNotes(): Flow<List<NoteEntity>>
 
+    @Query("SELECT * from notes where id=:id")
+    suspend fun fetchNoteWithId(id: Int): NoteEntity
+
     @Query("SELECT * from notes where title Like '%' || :query || '%'")
     fun fetchNotesWithQuery(query: String): Flow<List<NoteEntity>>
 }

@@ -1,5 +1,6 @@
 package com.example.mynotes.composables
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mynotes.ui.theme.antiFlashWhite
@@ -21,7 +23,8 @@ import com.example.mynotes.ui.theme.notesTextColorLight
 fun NotesBottomItem(
     modifier: Modifier = Modifier,
     color: Color = antiFlashWhite,
-    imageVector: ImageVector,
+    imageVector: ImageVector? = null,
+    painterId: Int,
     tint: Color = LocalContentColor.current,
     onClick: () -> Unit
 ) {
@@ -30,11 +33,19 @@ fun NotesBottomItem(
         color = color
     ) {
         IconButton(onClick = { onClick() }) {
-            Icon(
-                imageVector = imageVector,
-                contentDescription = null,
-                tint = tint
-            )
+            if (imageVector == null) {
+                Icon(
+                    painter = painterResource(id = painterId),
+                    contentDescription = null,
+                    tint = tint
+                )
+            } else {
+                Icon(
+                    imageVector = imageVector,
+                    contentDescription = null,
+                    tint = tint
+                )
+            }
         }
     }
 }
@@ -43,7 +54,7 @@ fun NotesBottomItem(
 @Preview(showBackground = true)
 @Composable
 fun NotesBottomItemPreview() {
-    NotesBottomItem(imageVector = Icons.Default.List) {
+    NotesBottomItem(painterId = 0, imageVector = Icons.Default.List) {
 
     }
 }

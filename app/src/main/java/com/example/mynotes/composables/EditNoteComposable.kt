@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
@@ -26,6 +27,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,12 +42,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.mynotes.BaseViewModel
 import com.example.mynotes.R
 import com.example.mynotes.model.NoteModel
+import com.example.mynotes.model.Photo
+import com.example.mynotes.room.toNoteModel
 import com.example.mynotes.ui.theme.notesTextColor
 import com.example.mynotes.ui.theme.notesTextColorLight
 import com.example.mynotes.utils.getDate
 import com.example.mynotes.utils.getTime
+import com.example.mynotes.viewModel.MainScreenViewModel
 import java.util.Calendar
 
 @Composable
@@ -54,8 +61,16 @@ fun EditNoteComposable(
     onUpdateNoteClick: (NoteModel) -> Unit,
     onNoteDelete: (NoteModel) -> Unit,
     toast: (String) -> Unit,
-    note: NoteModel
+    note: NoteModel,
+    onCameraClick: () -> Unit,
+    onGalleryClick: () -> Unit,
+    viewModel: BaseViewModel? = null,
+    onPhotoPreview: (Photo?, Int?) -> Unit,
+    onRemovePhoto: (Photo) -> Unit
 ) {
+    var setPhotos by remember {
+        mutableStateOf(true)
+    }
     var titleState by remember {
         mutableStateOf(note.title ?: "")
     }
@@ -65,107 +80,155 @@ fun EditNoteComposable(
     var showDialog by remember {
         mutableStateOf(false)
     }
+    if (setPhotos) {
+        viewModel?.setAll(note.photoList ?: emptyList())
+        viewModel?.setPhotos(viewModel.photoList)
+        setPhotos = false
+    }
+    val photoList = viewModel?.getPhotoListState()
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.White)
+            .background(color = Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = modifier
-                .padding(top = 16.dp, start = 8.dp, end = 8.dp)
-                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            ButtonComposable(imageVector = Icons.Default.KeyboardArrowLeft) {
-                onBackPressed()
-            }
+        Column(modifier = modifier.weight(1f)) {
             Row(
-                modifier = modifier,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = modifier
+                    .padding(top = 16.dp, start = 8.dp, end = 8.dp)
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    modifier = modifier
-                        .size(45.dp)
-                        .clickable {
-                            showDialog = true
-                        }, border = BorderStroke(1.dp, notesTextColorLight)
+                ButtonComposable(imageVector = Icons.Default.KeyboardArrowLeft) {
+                    onBackPressed()
+                }
+                Row(
+                    modifier = modifier,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Column(
-                        modifier = modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        ),
+                        modifier = modifier
+                            .size(45.dp)
+                            .clickable {
+                                showDialog = true
+                            }, border = BorderStroke(1.dp, notesTextColorLight)
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Delete,
-                            contentDescription = null,
-                            modifier = modifier.size(25.dp)
-                        )
+                        Column(
+                            modifier = modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Delete,
+                                contentDescription = null,
+                                modifier = modifier.size(25.dp)
+                            )
+                        }
                     }
-                }
-                SaveButtonComposable(text = stringResource(id = R.string.update)) {
-                    note.apply {
-                        if (title != titleState || body != bodyState) {
-                            val updatedNote = updateNote(titleState, bodyState, this, toast)
-                            onUpdateNoteClick(updatedNote)
+                    SaveButtonComposable(text = stringResource(id = R.string.update)) {
+                        note.apply {
+                            if (title != titleState || body != bodyState || this.photoList?.equals(
+                                    photoList
+                                ) == false
+                            ) {
+                                val updatedNote =
+                                    updateNote(
+                                        titleState,
+                                        bodyState,
+                                        this,
+                                        photoList ?: emptyList(),
+                                        toast
+                                    )
+                                onUpdateNoteClick(updatedNote)
 
-                        } else toast("make changes to update note...")
+                            } else toast("make changes to update note...")
+                        }
+
                     }
-
                 }
             }
+            TextField(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                value = titleState, onValueChange = {
+                    titleState = it
+                }, colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White
+                ), textStyle = TextStyle(
+                    color = notesTextColor, fontWeight = FontWeight.Black, fontSize = 20.sp
+                ), placeholder = {
+                    Text(
+                        text = "",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraLight,
+                        color = notesTextColor
+                    )
+                }
+            )
+            Text(
+                modifier = modifier.padding(start = 16.dp),
+                text = note.date ?: "",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.Gray
+            )
+            TextField(
+                modifier = modifier
+                    .fillMaxWidth(),
+                value = bodyState, onValueChange = {
+                    bodyState = it
+                }, colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White
+                ), textStyle = TextStyle(
+                    color = notesTextColor, fontWeight = FontWeight.Normal, fontSize = 17.sp
+                ), placeholder = {
+                    Text(
+                        text = "",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraLight,
+                        color = notesTextColor
+                    )
+                }
+            )
+            if (!photoList.isNullOrEmpty()) PhotoLazyComposable(
+                photoList = photoList,
+                onClick = onPhotoPreview,
+                onRemovePhoto = onRemovePhoto
+            )
         }
-        TextField(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            value = titleState, onValueChange = {
-                titleState = it
-            }, colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White
-            ), textStyle = TextStyle(
-                color = notesTextColor, fontWeight = FontWeight.Black, fontSize = 20.sp
-            ), placeholder = {
-                Text(
-                    text = "",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.ExtraLight,
-                    color = notesTextColor
-                )
+        NotesBottomComposable(onCreateNote = {
+            note.apply {
+                if (title != titleState || body != bodyState || this.photoList?.equals(
+                        photoList
+                    ) == false
+                ) {
+                    val updatedNote =
+                        updateNote(
+                            titleState,
+                            bodyState,
+                            this,
+                            photoList ?: emptyList(),
+                            toast
+                        )
+                    onUpdateNoteClick(updatedNote)
+
+                } else toast("make changes to update note...")
             }
-        )
-        Text(
-            modifier = modifier.padding(start = 16.dp),
-            text = note.date ?: "",
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Normal,
-            color = Color.Gray
-        )
-        TextField(
-            modifier = modifier
-                .fillMaxWidth(),
-            value = bodyState, onValueChange = {
-                bodyState = it
-            }, colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White
-            ), textStyle = TextStyle(
-                color = notesTextColor, fontWeight = FontWeight.Normal, fontSize = 17.sp
-            ), placeholder = {
-                Text(
-                    text = "",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.ExtraLight,
-                    color = notesTextColor
-                )
-            }
-        )
+
+        }, onCameraClick = {
+            onCameraClick()
+        }, imageVector = Icons.Default.Done, onGalleryClick = {
+            onGalleryClick()
+        })
     }
     if (showDialog) {
         DialogComposable(onDismiss = { showDialog = false }) {
@@ -179,6 +242,7 @@ fun updateNote(
     titleState: String,
     bodyState: String,
     note: NoteModel,
+    photoList: List<Photo>,
     toast: (String) -> Unit
 ): NoteModel {
     note.apply {
@@ -187,6 +251,7 @@ fun updateNote(
         timestamp = Calendar.getInstance().timeInMillis
         date = getDate()
         time = getTime()
+        this.photoList = photoList
         isEdited = true
         return this
     }
@@ -195,8 +260,19 @@ fun updateNote(
 @Preview(showBackground = true)
 @Composable
 fun EditNoteComposablePreview() {
-    EditNoteComposable(onBackPressed = {}, onUpdateNoteClick = {}, note = NoteModel(
-        title = "Title", date = "4 February 2024", body = "Note"
-    ), onNoteDelete = {}, toast = {}
+    EditNoteComposable(
+        onBackPressed = {},
+        onUpdateNoteClick = {},
+        onNoteDelete = {},
+        toast = {},
+        note = NoteModel(
+            title = "Title",
+            body = "Note",
+            date = "Feb 14, 2024"
+        ),
+        onCameraClick = {},
+        onPhotoPreview = {photo, i ->  },
+        onGalleryClick = {},
+        onRemovePhoto = {}
     )
 }

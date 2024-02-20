@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mynotes.BaseViewModel
 import com.example.mynotes.ResultState
 import com.example.mynotes.domain.CreateNoteUseCase
 import com.example.mynotes.domain.DeleteNoteUseCase
@@ -25,7 +26,7 @@ class SearchViewModel @Inject constructor(
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val fetchNotesWithQueryUseCase: FetchNotesWithQueryUseCase
 ) :
-    ViewModel() {
+    BaseViewModel() {
     private var _notesLiveData: MutableLiveData<ResultState<List<NoteEntity>>>? = null
 
     fun getNotesLiveData(): LiveData<ResultState<List<NoteEntity>>>? = _notesLiveData

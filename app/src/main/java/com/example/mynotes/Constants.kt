@@ -2,9 +2,8 @@ package com.example.mynotes
 
 class Constants {
     companion object {
-        const val EDITNOTES: String = "editNoteComposable"
-        const val MAINSCREEN  = "mainComposable"
-        const val SEARCH = "search"
-        const val CREATENOTES: String = "createNoteComposable"
+        const val NOTE = "note"
+        const val POS = "pos"
+        const val FROM_CREATE: String = "fromCreate"
     }
 }

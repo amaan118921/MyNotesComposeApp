@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -13,12 +12,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyNotes"
         tools:targetApi="31">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="@string/authorities"
+            android:exported="false"
+            android:grantUriPermissions="true" >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_path" />
+
+        </provider>
+
         <activity
-            android:windowSoftInputMode="adjustResize"
             android:name=".SearchScreenActivity"
             android:exported="false"
             android:label="@string/title_activity_search_screen"
-            android:theme="@style/Theme.MyNotes" />
+            android:theme="@style/Theme.MyNotes"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

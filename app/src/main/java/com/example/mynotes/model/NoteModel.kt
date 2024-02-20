@@ -12,7 +12,8 @@ data class NoteModel(
     var timestamp: Long? = null,
     var time: String? = null,
     var date: String? = null,
-    var isEdited: Boolean = false
+    var isEdited: Boolean = false,
+    var photoList: List<Photo>? = null
 ) : Comparable<Any>, Parcelable {
 
     override fun compareTo(other: Any): Int {
@@ -54,6 +55,7 @@ fun NoteModel.toNoteEntity(): NoteEntity {
         timestamp ?: 0L,
         time = time ?: "",
         date = date ?: "",
-        isEdited = isEdited
+        isEdited = isEdited,
+        photoList = photoList?: emptyList()
     )
 }

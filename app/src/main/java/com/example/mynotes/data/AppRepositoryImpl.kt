@@ -26,6 +26,10 @@ class AppRepositoryImpl @Inject constructor(private val dao: AppDao) : AppReposi
         dao.deleteNote(noteEntity)
     }
 
+    override suspend fun fetchNoteWithId(id: Int): NoteEntity {
+        return dao.fetchNoteWithId(id)
+    }
+
     override fun fetchNotesWithQuery(query: String): Flow<List<NoteEntity>> {
         return dao.fetchNotesWithQuery(query)
     }
