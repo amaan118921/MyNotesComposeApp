@@ -47,6 +47,9 @@ class SearchScreenActivity : BaseActivity() {
     private var note: NoteModel? = null
 
     @Inject
+    lateinit var compressUtils: CompressUtils
+
+    @Inject
     lateinit var cameraApi: CameraApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +78,8 @@ class SearchScreenActivity : BaseActivity() {
                                 },
                                 navigateToEditNote = { note ->
                                     this@SearchScreenActivity.note = note
-                                    val noteString = getUriEncoded(note?: NoteModel())
+                                    val noteString = getUriEncoded(note ?: NoteModel())
+                                    viewModel.setNote(note ?: NoteModel())
                                     navController.navigate(
                                         Screen.EditNote.createRoute(
                                             noteString
@@ -101,7 +105,6 @@ class SearchScreenActivity : BaseActivity() {
                             val fromCreate = it.arguments?.getBoolean(Constants.FROM_CREATE)
                             val initPos = it.arguments?.getInt(Constants.POS)
                             ImagePreviewComposable(
-                                photoList = viewModel.photoList,
                                 onBack = { create ->
                                     popBackStack(
                                         navController = navController,
@@ -109,14 +112,19 @@ class SearchScreenActivity : BaseActivity() {
                                     )
                                 },
                                 isFromCreate = fromCreate ?: true,
-                                initPos = initPos
+                                initPos = initPos,
+                                viewModel = viewModel,
+                                onRemove = {
+                                    viewModel.removePhoto(it)
+                                    viewModel.setPhotos(viewModel.photoList)
+                                    viewModel.updateNoteWithPhotos(it)
+                                }
                             )
                         }
                         composable(
                             Screen.EditNote.route,
                             arguments = Screen.EditNote.navArguments
                         ) {
-                            val note = it.arguments?.getParcelable<NoteModel>(Constants.NOTE)
                             EditNoteComposable(
                                 onBackPressed = {
                                     popBackStack(
@@ -132,7 +140,6 @@ class SearchScreenActivity : BaseActivity() {
                                     viewModel.deleteNote(it)
                                     finish()
                                 },
-                                note = note ?: NoteModel(),
                                 toast = {
                                     showToast(it)
                                 },
@@ -163,7 +170,9 @@ class SearchScreenActivity : BaseActivity() {
     private fun openCamera() {
         val uri = cameraApi.getOutputMediaFileUri(CameraApi.MEDIA_TYPE_IMAGE)
         this.currentUri = uri
-        launcher?.launch(currentUri)
+        currentUri?.let {
+            launcher?.launch(it)
+        }
     }
 
     override fun onStart() {
@@ -174,17 +183,27 @@ class SearchScreenActivity : BaseActivity() {
     private fun registerLauncher() {
         launcher = registerForActivityResult(ActivityResultContracts.TakePicture()) {
             if (it) {
-                viewModel.addPhoto(Photo(uri = currentUri.toString()))
-                viewModel.setPhotos(viewModel.photoList)
+                savePhoto(currentUri)
             }
         }
         galleryLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) {
             it?.forEach { uri ->
-                viewModel.addPhoto(Photo(uri = uri.toString()))
-                viewModel.setPhotos(viewModel.photoList)
+                savePhoto(uri)
             }
         }
     }
+
+    private fun savePhoto(uri: Uri?) {
+        val photo = Photo(
+            uri = uri.toString(),
+        )
+        viewModel.addPhoto(
+            photo
+        )
+        viewModel.setPhotos(viewModel.photoList)
+        viewModel.updateNoteWithPhotos(photo = photo)
+    }
+
 
     private fun popBackStack(navController: NavHostController, route: String) {
         navController.popBackStack(route = route, inclusive = false, saveState = true)

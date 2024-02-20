@@ -7,3 +7,7 @@ fun <T> getUriEncoded(obj: T): String {
     val json = Gson().toJson(obj)
     return Uri.encode(json)
 }
+
+fun Any?.isNull(): Boolean {
+    return this==null
+}

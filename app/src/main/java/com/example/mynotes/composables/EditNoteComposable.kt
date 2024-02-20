@@ -61,31 +61,22 @@ fun EditNoteComposable(
     onUpdateNoteClick: (NoteModel) -> Unit,
     onNoteDelete: (NoteModel) -> Unit,
     toast: (String) -> Unit,
-    note: NoteModel,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
     viewModel: BaseViewModel? = null,
     onPhotoPreview: (Photo?, Int?) -> Unit,
     onRemovePhoto: (Photo) -> Unit
 ) {
-    var setPhotos by remember {
-        mutableStateOf(true)
-    }
+    val note = viewModel?.note?.observeAsState()?.value
     var titleState by remember {
-        mutableStateOf(note.title ?: "")
+        mutableStateOf(note?.title ?: "")
     }
     var bodyState by remember {
-        mutableStateOf(note.body ?: "")
+        mutableStateOf(note?.body ?: "")
     }
     var showDialog by remember {
         mutableStateOf(false)
     }
-    if (setPhotos) {
-        viewModel?.setAll(note.photoList ?: emptyList())
-        viewModel?.setPhotos(viewModel.photoList)
-        setPhotos = false
-    }
-    val photoList = viewModel?.getPhotoListState()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -128,10 +119,8 @@ fun EditNoteComposable(
                         }
                     }
                     SaveButtonComposable(text = stringResource(id = R.string.update)) {
-                        note.apply {
-                            if (title != titleState || body != bodyState || this.photoList?.equals(
-                                    photoList
-                                ) == false
+                        note?.apply {
+                            if (title != titleState || body != bodyState || editedNow
                             ) {
                                 val updatedNote =
                                     updateNote(
@@ -145,7 +134,6 @@ fun EditNoteComposable(
 
                             } else toast("make changes to update note...")
                         }
-
                     }
                 }
             }
@@ -173,7 +161,7 @@ fun EditNoteComposable(
             )
             Text(
                 modifier = modifier.padding(start = 16.dp),
-                text = note.date ?: "",
+                text = note?.date ?: "",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.Gray
@@ -199,14 +187,14 @@ fun EditNoteComposable(
                     )
                 }
             )
-            if (!photoList.isNullOrEmpty()) PhotoLazyComposable(
-                photoList = photoList,
+            if (!note?.photoList.isNullOrEmpty()) PhotoLazyComposable(
+                photoList = note?.photoList ?: emptyList(),
                 onClick = onPhotoPreview,
                 onRemovePhoto = onRemovePhoto
             )
         }
         NotesBottomComposable(onCreateNote = {
-            note.apply {
+            note?.apply {
                 if (title != titleState || body != bodyState || this.photoList?.equals(
                         photoList
                     ) == false
@@ -232,7 +220,9 @@ fun EditNoteComposable(
     }
     if (showDialog) {
         DialogComposable(onDismiss = { showDialog = false }) {
-            onNoteDelete(note)
+            note?.let {
+                onNoteDelete(it)
+            }
             showDialog = false
         }
     }
@@ -265,13 +255,8 @@ fun EditNoteComposablePreview() {
         onUpdateNoteClick = {},
         onNoteDelete = {},
         toast = {},
-        note = NoteModel(
-            title = "Title",
-            body = "Note",
-            date = "Feb 14, 2024"
-        ),
         onCameraClick = {},
-        onPhotoPreview = {photo, i ->  },
+        onPhotoPreview = { photo, i -> },
         onGalleryClick = {},
         onRemovePhoto = {}
     )

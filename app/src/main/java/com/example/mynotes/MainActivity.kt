@@ -86,7 +86,8 @@ class MainActivity : BaseActivity() {
                             },
                             navigateToEditNote = { note ->
                                 this@MainActivity.note = note
-                                val noteString = getUriEncoded(note?: NoteModel())
+                                val noteString = getUriEncoded(note ?: NoteModel())
+                                viewModel.setNote(note ?: NoteModel())
                                 navController.navigate(
                                     Screen.EditNote.createRoute(noteString)
                                 )
@@ -101,8 +102,8 @@ class MainActivity : BaseActivity() {
                     ) {
                         val fromCreate = it.arguments?.getBoolean(Constants.FROM_CREATE)
                         val initPos = it.arguments?.getInt(Constants.POS)
+                        val note = it.arguments?.getParcelable<NoteModel>(Constants.NOTE)
                         ImagePreviewComposable(
-                            photoList = viewModel.photoList,
                             onBack = { create ->
                                 popBackStack(
                                     navController = navController,
@@ -110,14 +111,19 @@ class MainActivity : BaseActivity() {
                                 )
                             },
                             isFromCreate = fromCreate ?: true,
-                            initPos = initPos
+                            initPos = initPos,
+                            viewModel = viewModel,
+                            onRemove = {
+                                viewModel.removePhoto(it)
+                                viewModel.setPhotos(viewModel.photoList)
+                                viewModel.updateNoteWithPhotos(it)
+                            }
                         )
                     }
                     composable(
                         Screen.EditNote.route,
                         arguments = Screen.EditNote.navArguments
                     ) {
-                        val note = it.arguments?.getParcelable<NoteModel>(Constants.NOTE)
                         EditNoteComposable(
                             onBackPressed = {
                                 popBackStack(
@@ -139,7 +145,6 @@ class MainActivity : BaseActivity() {
                                     route = Screen.MainScreen.route
                                 )
                             },
-                            note = note ?: NoteModel(),
                             toast = {
                                 showToast(it)
                             },
@@ -166,7 +171,7 @@ class MainActivity : BaseActivity() {
                         }, onCreateNoteClick = {
                             viewModel.createNote(it)
                             popBackStack(navController = navController, Screen.MainScreen.route)
-                            if (it.body.isNullOrEmpty() && it.title.isNullOrEmpty()) {
+                            if (it.body.isNullOrEmpty() && it.title.isNullOrEmpty() && it.photoList.isNullOrEmpty()) {
                                 Looper.myLooper()?.let { looper ->
                                     Handler(looper).postDelayed({
                                         viewModel.deleteNote(it)
@@ -207,21 +212,25 @@ class MainActivity : BaseActivity() {
             if (it) {
                 val compressedFile = compressUtils.getCompressedPath(file, width)
                 val compressedUri = cameraApi.contentUriFromFile(compressedFile)
-                viewModel.addPhoto(
-                    Photo(
-                        uri = currentUri.toString(),
-                        isPortrait = compressUtils.isPortrait(file)
-                    )
-                )
-                viewModel.setPhotos(viewModel.photoList)
+                savePhoto(currentUri)
             }
         }
         galleryLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) {
             it?.forEach { uri ->
-                viewModel.addPhoto(Photo(uri = uri.toString()))
-                viewModel.setPhotos(viewModel.photoList)
+                savePhoto(uri)
             }
         }
+    }
+
+    private fun savePhoto(uri: Uri?) {
+        val photo = Photo(
+            uri = uri.toString(),
+        )
+        viewModel.addPhoto(
+            photo
+        )
+        viewModel.setPhotos(viewModel.photoList)
+        viewModel.updateNoteWithPhotos(photo = photo)
     }
 
     private fun openCamera() {
