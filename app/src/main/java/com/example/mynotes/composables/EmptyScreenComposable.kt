@@ -21,7 +21,11 @@ import com.example.mynotes.R
 import com.example.mynotes.ui.theme.notesTextBodyColor
 
 @Composable
-fun EmptyScreenComposable(modifier: Modifier = Modifier, paddingValues: PaddingValues = PaddingValues()) {
+fun EmptyScreenComposable(
+    modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(),
+    isFromTrash: Boolean = false
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -30,11 +34,11 @@ fun EmptyScreenComposable(modifier: Modifier = Modifier, paddingValues: PaddingV
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.notes),
+            painter = painterResource(id = if (!isFromTrash) R.drawable.notes else R.drawable.trash_bin__1_),
             contentDescription = null
         )
         Text(
-            text = stringResource(id = R.string.no_notes_found),
+            text = stringResource(id = if (!isFromTrash) R.string.no_notes_found else R.string.empty_trash),
             modifier = modifier.padding(top = 16.dp),
             style = MaterialTheme.typography.labelLarge,
             color = notesTextBodyColor,

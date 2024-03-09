@@ -2,7 +2,11 @@ package com.example.mynotes.model
 
 import android.os.Parcelable
 import com.example.mynotes.room.NoteEntity
+import com.example.mynotes.room.TrashEntity
+import com.example.mynotes.utils.getDate
+import com.example.mynotes.utils.getTime
 import kotlinx.parcelize.Parcelize
+import java.util.Calendar
 
 @Parcelize
 data class NoteModel(
@@ -14,8 +18,19 @@ data class NoteModel(
     var date: String? = null,
     var isEdited: Boolean = false,
     var photoList: List<Photo>? = null,
-    var editedNow: Boolean = false
 ) : Comparable<Any>, Parcelable {
+
+    fun deepCopy(): NoteModel {
+        return NoteModel(
+            title = this.title,
+            body = this.body,
+            timestamp = Calendar.getInstance().timeInMillis,
+            time = getTime(),
+            date = getDate(),
+            isEdited = false,
+            photoList = this.photoList
+        )
+    }
 
     override fun compareTo(other: Any): Int {
 
@@ -57,6 +72,19 @@ fun NoteModel.toNoteEntity(): NoteEntity {
         time = time ?: "",
         date = date ?: "",
         isEdited = isEdited,
-        photoList = photoList?: emptyList()
+        photoList = photoList ?: emptyList()
+    )
+}
+
+fun NoteModel.toTrashEntity(): TrashEntity {
+    return TrashEntity(
+        id,
+        title ?: "",
+        body ?: "",
+        timestamp ?: 0L,
+        time = time ?: "",
+        date = date ?: "",
+        isEdited = isEdited,
+        photoList = photoList ?: emptyList()
     )
 }

@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -66,13 +67,13 @@ fun SearchBarComposable(
             .clickable {
                 onClick()
             },
-        color = antiFlashWhite
+        color = MaterialTheme.colorScheme.onSecondary
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (enabled) IconButton(onClick = { onBack() }) {
                 Icon(
                     imageVector =
-                    Icons.Default.ArrowBack, contentDescription = "back"
+                    Icons.Default.ArrowBack, contentDescription = "back",
                 )
             }
             TextField(
@@ -110,11 +111,13 @@ fun SearchBarComposable(
                     Text(text = "Search")
                 },
                 colors = TextFieldDefaults.colors(
-                    disabledPlaceholderColor = notesTextColor,
-                    disabledTrailingIconColor = notesTextColor,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.secondary,
+                    focusedTrailingIconColor = MaterialTheme.colorScheme.secondary,
+                    disabledPlaceholderColor = MaterialTheme.colorScheme.secondary,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.secondary,
                     disabledIndicatorColor = Color.Transparent,
-                    disabledContainerColor = antiFlashWhite,
-                    focusedContainerColor = antiFlashWhite,
+                    disabledContainerColor = MaterialTheme.colorScheme.onSecondary,
+                    focusedContainerColor = MaterialTheme.colorScheme.onSecondary,
                     unfocusedContainerColor = antiFlashWhite,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent

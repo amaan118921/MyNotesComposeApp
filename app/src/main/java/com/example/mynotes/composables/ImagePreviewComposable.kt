@@ -1,12 +1,14 @@
 package com.example.mynotes.composables
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -17,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +34,9 @@ import androidx.compose.ui.unit.dp
 import com.example.mynotes.BaseViewModel
 import com.example.mynotes.model.Photo
 import com.example.mynotes.ui.theme.notesTextColor
+import net.engawapg.lib.zoomable.rememberZoomState
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImagePreviewComposable(
     modifier: Modifier = Modifier,
@@ -39,6 +44,8 @@ fun ImagePreviewComposable(
     initPos: Int?,
     viewModel: BaseViewModel?,
     isFromCreate: Boolean,
+    isFromTrash: Boolean = false,
+    toast: (String) -> Unit = {},
     onRemove: (Int) -> Unit
 ) {
     var position by remember {
@@ -47,9 +54,14 @@ fun ImagePreviewComposable(
     var expanded by remember {
         mutableStateOf(false)
     }
+    val zoomState = rememberZoomState()
     val photoList = viewModel?.getPhotoListState()
+    val pagerState = rememberPagerState(initPos ?: 0) { photoList?.size ?: 0 }
     if (photoList?.isEmpty() == true) {
         onBack(isFromCreate)
+    }
+    LaunchedEffect(position) {
+        zoomState.reset()
     }
     Column {
         Surface(
@@ -88,6 +100,11 @@ fun ImagePreviewComposable(
                         {
                             Text(text = "Delete")
                         }, onClick = {
+                            if (isFromTrash) {
+                                toast("Can't edit in trash...")
+                                expanded = false
+                                return@DropdownMenuItem
+                            }
                             onRemove(position)
                             expanded = false
                         })
@@ -95,18 +112,12 @@ fun ImagePreviewComposable(
                 }
             }
         }
-        ComposePagerSnapHelper(
-            width = LocalConfiguration.current.screenWidthDp.dp,
-            onPositionChange = {
-                position = it
-            }, initialPosition = initPos
-        ) {
-            LazyRow(state = it) {
-                items(items = photoList ?: emptyList()) { photo ->
-                    if (!photo.isPortrait) SingleImagePreviewComposablePortrait(photo = photo)
-                    else SingleImagePreviewComposableLandscape(photo = photo)
-                }
-            }
+        HorizontalPager(state = pagerState, pageSize = PageSize.Fill) { idx ->
+            position = pagerState.currentPage
+            SingleImagePreviewComposablePortrait(
+                photo = photoList?.get(idx) ?: Photo(),
+                zoomState = zoomState
+            )
         }
     }
 }
@@ -119,5 +130,7 @@ fun ImagePreviewComposablePreview() {
         isFromCreate = false,
         initPos = null,
         viewModel = null,
+        toast = {},
+        isFromTrash = false,
         onRemove = {})
 }

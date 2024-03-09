@@ -1,6 +1,7 @@
 package com.example.mynotes.domain
 
 import com.example.mynotes.room.NoteEntity
+import com.example.mynotes.room.TrashEntity
 import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {

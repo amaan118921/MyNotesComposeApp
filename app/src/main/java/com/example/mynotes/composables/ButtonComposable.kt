@@ -13,6 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +27,7 @@ import com.example.mynotes.ui.theme.notesTextColorLight
 fun ButtonComposable(modifier: Modifier = Modifier, imageVector: ImageVector, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         modifier = modifier
             .size(45.dp)
@@ -40,6 +41,7 @@ fun ButtonComposable(modifier: Modifier = Modifier, imageVector: ImageVector, on
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
+                tint = MaterialTheme.colorScheme.secondary,
                 imageVector = imageVector,
                 contentDescription = null,
                 modifier = modifier.size(25.dp)

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +28,7 @@ fun SaveButtonComposable(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = saveBtnColor
+            containerColor = MaterialTheme.colorScheme.secondary
         ),
         modifier = modifier
             .size(width = 80.dp, height = 45.dp)
@@ -43,8 +44,8 @@ fun SaveButtonComposable(
             Text(
                 modifier = modifier.padding(10.dp),
                 text = text,
-                color = Color.White,
-                fontWeight = FontWeight.Normal
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Medium
             )
         }
     }

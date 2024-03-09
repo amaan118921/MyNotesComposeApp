@@ -16,11 +16,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,15 +30,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.mynotes.R
 import com.example.mynotes.ui.theme.notesTextColor
 
 @Composable
-fun DialogComposable(modifier: Modifier = Modifier, onDismiss: () -> Unit, onDelete: () -> Unit) {
+fun DialogComposable(
+    modifier: Modifier = Modifier,
+    isFromTrash: Boolean = false,
+    onDismiss: () -> Unit, onDelete: () -> Unit
+) {
     Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties()) {
         Card(
             modifier = modifier
                 .padding(20.dp), colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
             Column(modifier = modifier.padding(20.dp)) {
@@ -47,7 +54,7 @@ fun DialogComposable(modifier: Modifier = Modifier, onDismiss: () -> Unit, onDel
                     Text(
                         modifier = modifier.weight(1f),
                         text = "Delete Note?",
-                        color = notesTextColor,
+                        color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 16.sp,
                         fontFamily = FontFamily.Default
@@ -58,8 +65,8 @@ fun DialogComposable(modifier: Modifier = Modifier, onDismiss: () -> Unit, onDel
                 }
                 Text(
                     modifier = modifier.padding(top = 12.dp),
-                    text = "Are you sure, you want to delete this note?",
-                    color = notesTextColor,
+                    text = stringResource(id = if (isFromTrash) R.string.delete_note_from_trash else R.string.delete_note),
+                    color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp,
                     fontFamily = FontFamily.Default
@@ -74,7 +81,7 @@ fun DialogComposable(modifier: Modifier = Modifier, onDismiss: () -> Unit, onDel
                             .weight(0.5f)
                             .padding(end = 12.dp),
                         onClick = { onDismiss() }, colors = ButtonDefaults.buttonColors(
-                            containerColor = notesTextColor
+                            containerColor = MaterialTheme.colorScheme.secondary
                         )
                     ) {
                         Text(text = "Cancel")
@@ -84,7 +91,7 @@ fun DialogComposable(modifier: Modifier = Modifier, onDismiss: () -> Unit, onDel
                             .weight(0.5f)
                             .padding(start = 12.dp),
                         onClick = { onDelete() }, colors = ButtonDefaults.buttonColors(
-                            containerColor = notesTextColor
+                            containerColor = MaterialTheme.colorScheme.secondary
                         )
                     ) {
                         Text(text = "Delete")

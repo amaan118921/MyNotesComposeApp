@@ -3,9 +3,12 @@ package com.example.mynotes.hilt
 import android.content.Context
 import androidx.room.Room
 import com.example.mynotes.data.AppRepositoryImpl
+import com.example.mynotes.data.TrashRepositoryImpl
 import com.example.mynotes.domain.AppRepository
-import com.example.mynotes.room.AppDao
+import com.example.mynotes.domain.TrashRepository
+import com.example.mynotes.room.NotesDao
 import com.example.mynotes.room.AppDatabase
+import com.example.mynotes.room.TrashDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,13 +37,24 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAppDao(appDatabase: AppDatabase): AppDao {
-        return appDatabase.getDao()
+    fun provideAppDao(appDatabase: AppDatabase): NotesDao {
+        return appDatabase.getNotesDao()
     }
 
     @Provides
     @Singleton
-    fun provideAppRepository(dao: AppDao): AppRepository {
+    fun provideTrashDao(appDatabase: AppDatabase): TrashDao {
+        return appDatabase.getTrashDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTrashRepository(trashDao: TrashDao): TrashRepository {
+        return TrashRepositoryImpl(trashDao)
+    }
+    @Provides
+    @Singleton
+    fun provideAppRepository(dao: NotesDao): AppRepository {
         return AppRepositoryImpl(dao)
     }
 }
