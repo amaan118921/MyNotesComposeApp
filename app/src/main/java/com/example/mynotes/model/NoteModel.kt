@@ -13,7 +13,8 @@ data class NoteModel(
     var time: String? = null,
     var date: String? = null,
     var isEdited: Boolean = false,
-    var photoList: List<Photo>? = null
+    var photoList: List<Photo>? = null,
+    var editedNow: Boolean = false
 ) : Comparable<Any>, Parcelable {
 
     override fun compareTo(other: Any): Int {
