@@ -1,6 +1,5 @@
 package com.example.mynotes.domain
 
-import androidx.lifecycle.LiveData
 import com.example.mynotes.room.NoteEntity
 import javax.inject.Inject
 import javax.inject.Singleton

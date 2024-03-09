@@ -56,4 +56,10 @@ sealed class Screen(
         fun createRoute() = "searchScreenComposable"
     }
 
+    data object TrashScreen : Screen(
+        route = "trashScreenComposable"
+    ) {
+        fun createRoute() = "trashScreenComposable"
+    }
+
 }

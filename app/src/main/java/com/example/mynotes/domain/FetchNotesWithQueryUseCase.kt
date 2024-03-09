@@ -1,5 +1,7 @@
 package com.example.mynotes.domain
 
+import android.util.Log
+import com.example.mynotes.Constants.Companion.TAG
 import com.example.mynotes.ResultState
 import com.example.mynotes.room.NoteEntity
 import kotlinx.coroutines.flow.Flow
@@ -11,8 +13,12 @@ import javax.inject.Singleton
 class FetchNotesWithQueryUseCase @Inject constructor(private val appRepository: AppRepository) {
     operator fun invoke(query: String): Flow<ResultState<List<NoteEntity>>> = flow {
         emit(ResultState.Loading())
-        appRepository.fetchNotesWithQuery(query).collect {
-            emit(ResultState.Success(it))
+        try {
+            appRepository.fetchNotesWithQuery(query).collect {
+                emit(ResultState.Success(it))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "invoke: $e")
         }
     }
 }

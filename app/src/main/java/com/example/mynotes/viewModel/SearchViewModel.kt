@@ -41,6 +41,7 @@ class SearchViewModel @Inject constructor(
             }
         }
     }
+
     fun createNote(noteModel: NoteModel) {
         viewModelScope.launch {
             createNoteUseCase(
@@ -56,6 +57,7 @@ class SearchViewModel @Inject constructor(
             )
         }
     }
+
     fun updateNote(it: NoteModel) {
         viewModelScope.launch {
             updateNoteUseCase(

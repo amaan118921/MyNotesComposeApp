@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -68,7 +69,7 @@ fun CreateNoteComposable(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.White), horizontalAlignment = Alignment.CenterHorizontally
+            .background(color = MaterialTheme.colorScheme.surface), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(modifier = modifier.weight(1f)) {
             Row(
@@ -93,16 +94,16 @@ fun CreateNoteComposable(
                 }, colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ), textStyle = TextStyle(
-                    color = notesTextColor, fontWeight = FontWeight.Black, fontSize = 20.sp
+                    color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Black, fontSize = 20.sp
                 ), placeholder = {
                     Text(
                         text = "Title",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraLight,
-                        color = notesTextColor
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             )
@@ -121,16 +122,16 @@ fun CreateNoteComposable(
                 }, colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ), textStyle = TextStyle(
-                    color = notesTextColor, fontWeight = FontWeight.Normal, fontSize = 17.sp
+                    color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Normal, fontSize = 17.sp
                 ), placeholder = {
                     Text(
                         text = "Note",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.ExtraLight,
-                        color = notesTextColor
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             )

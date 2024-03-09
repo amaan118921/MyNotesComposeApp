@@ -21,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -57,22 +58,25 @@ import java.util.Calendar
 @Composable
 fun EditNoteComposable(
     modifier: Modifier = Modifier,
+    isFromTrash: Boolean = false,
     onBackPressed: () -> Unit,
     onUpdateNoteClick: (NoteModel) -> Unit,
     onNoteDelete: (NoteModel) -> Unit,
     toast: (String) -> Unit,
+    note: NoteModel,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
     viewModel: BaseViewModel? = null,
+    onRestoreClick: ((NoteModel) -> Unit)? = null,
     onPhotoPreview: (Photo?, Int?) -> Unit,
     onRemovePhoto: (Photo) -> Unit
 ) {
-    val note = viewModel?.note?.observeAsState()?.value
+    val photoList = viewModel?.getPhotoListState()
     var titleState by remember {
-        mutableStateOf(note?.title ?: "")
+        mutableStateOf(note.title ?: "")
     }
     var bodyState by remember {
-        mutableStateOf(note?.body ?: "")
+        mutableStateOf(note.body ?: "")
     }
     var showDialog by remember {
         mutableStateOf(false)
@@ -80,7 +84,7 @@ fun EditNoteComposable(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color.White),
+            .background(color = MaterialTheme.colorScheme.surface),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(modifier = modifier.weight(1f)) {
@@ -98,7 +102,7 @@ fun EditNoteComposable(
                 ) {
                     Card(
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
                         modifier = modifier
                             .size(45.dp)
@@ -112,15 +116,22 @@ fun EditNoteComposable(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
+                                tint = MaterialTheme.colorScheme.secondary,
                                 imageVector = Icons.Outlined.Delete,
                                 contentDescription = null,
                                 modifier = modifier.size(25.dp)
                             )
                         }
                     }
-                    SaveButtonComposable(text = stringResource(id = R.string.update)) {
-                        note?.apply {
-                            if (title != titleState || body != bodyState || editedNow
+                    SaveButtonComposable(text = stringResource(id = if (isFromTrash) R.string.restore else R.string.update)) {
+                        if (isFromTrash) {
+                            onRestoreClick?.invoke(note)
+                            return@SaveButtonComposable
+                        }
+                        note.apply {
+                            if (title != titleState || body != bodyState || this.photoList?.equals(
+                                    photoList
+                                ) == false
                             ) {
                                 val updatedNote =
                                     updateNote(
@@ -146,22 +157,22 @@ fun EditNoteComposable(
                 }, colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor =  MaterialTheme.colorScheme.surface
                 ), textStyle = TextStyle(
-                    color = notesTextColor, fontWeight = FontWeight.Black, fontSize = 20.sp
+                    color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Black, fontSize = 20.sp
                 ), placeholder = {
                     Text(
                         text = "",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraLight,
-                        color = notesTextColor
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             )
             Text(
                 modifier = modifier.padding(start = 16.dp),
-                text = note?.date ?: "",
+                text = note.date ?: "",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.Gray
@@ -174,27 +185,31 @@ fun EditNoteComposable(
                 }, colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ), textStyle = TextStyle(
-                    color = notesTextColor, fontWeight = FontWeight.Normal, fontSize = 17.sp
+                    color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Normal, fontSize = 17.sp
                 ), placeholder = {
                     Text(
                         text = "",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.ExtraLight,
-                        color = notesTextColor
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             )
-            if (!note?.photoList.isNullOrEmpty()) PhotoLazyComposable(
-                photoList = note?.photoList ?: emptyList(),
+            if (!photoList.isNullOrEmpty()) PhotoLazyComposable(
+                photoList = photoList,
                 onClick = onPhotoPreview,
                 onRemovePhoto = onRemovePhoto
             )
         }
         NotesBottomComposable(onCreateNote = {
-            note?.apply {
+            if (isFromTrash) {
+                onRestoreClick?.invoke(note)
+                return@NotesBottomComposable
+            }
+            note.apply {
                 if (title != titleState || body != bodyState || this.photoList?.equals(
                         photoList
                     ) == false
@@ -216,11 +231,11 @@ fun EditNoteComposable(
             onCameraClick()
         }, imageVector = Icons.Default.Done, onGalleryClick = {
             onGalleryClick()
-        })
+        }, isFromTrash = isFromTrash)
     }
     if (showDialog) {
-        DialogComposable(onDismiss = { showDialog = false }) {
-            note?.let {
+        DialogComposable(onDismiss = { showDialog = false }, isFromTrash = isFromTrash) {
+            note.let {
                 onNoteDelete(it)
             }
             showDialog = false
@@ -258,6 +273,8 @@ fun EditNoteComposablePreview() {
         onCameraClick = {},
         onPhotoPreview = { photo, i -> },
         onGalleryClick = {},
-        onRemovePhoto = {}
+        onRemovePhoto = {},
+        note = NoteModel(title = "Title", body = "Note", date = "Feb 13, 2024"),
+        onRestoreClick = {}
     )
 }

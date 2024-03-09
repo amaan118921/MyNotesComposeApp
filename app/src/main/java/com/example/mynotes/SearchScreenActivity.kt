@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
@@ -23,10 +24,12 @@ import com.example.mynotes.composables.EditNoteComposable
 import com.example.mynotes.composables.ImagePreviewComposable
 import com.example.mynotes.composables.SearchScreenComposable
 import com.example.mynotes.compose.Screen
+import com.example.mynotes.enums.Theme
 import com.example.mynotes.helper.CameraApi
 import com.example.mynotes.model.NoteModel
 import com.example.mynotes.model.Photo
 import com.example.mynotes.ui.theme.MyNotesTheme
+import com.example.mynotes.utils.Preferences
 import com.example.mynotes.utils.getUriEncoded
 import com.example.mynotes.viewModel.SearchViewModel
 import com.google.gson.Gson
@@ -35,6 +38,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,11 +54,17 @@ class SearchScreenActivity : BaseActivity() {
     lateinit var compressUtils: CompressUtils
 
     @Inject
+    lateinit var preferences: Preferences
+
+    @Inject
     lateinit var cameraApi: CameraApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyNotesTheme {
+            val darkMode by rememberSaveable {
+                mutableStateOf(isDarkMode())
+            }
+            MyNotesTheme(darkMode) {
                 var showProgressBar by remember {
                     mutableStateOf(false)
                 }
@@ -79,7 +89,8 @@ class SearchScreenActivity : BaseActivity() {
                                 navigateToEditNote = { note ->
                                     this@SearchScreenActivity.note = note
                                     val noteString = getUriEncoded(note ?: NoteModel())
-                                    viewModel.setNote(note ?: NoteModel())
+                                    viewModel.setAll(note?.photoList ?: emptyList())
+                                    viewModel.setPhotos(viewModel.photoList)
                                     navController.navigate(
                                         Screen.EditNote.createRoute(
                                             noteString
@@ -90,7 +101,7 @@ class SearchScreenActivity : BaseActivity() {
                                 enabled = true,
                                 onSearch = {
                                     searchJob?.cancel(null)
-                                    searchJob = lifecycleScope.launch(Dispatchers.Default) {
+                                    searchJob = lifecycleScope.launch {
                                         delay(500)
                                         viewModel.fetchNotesWithQuery(it.trim())
                                     }
@@ -117,7 +128,6 @@ class SearchScreenActivity : BaseActivity() {
                                 onRemove = {
                                     viewModel.removePhoto(it)
                                     viewModel.setPhotos(viewModel.photoList)
-                                    viewModel.updateNoteWithPhotos(it)
                                 }
                             )
                         }
@@ -125,6 +135,7 @@ class SearchScreenActivity : BaseActivity() {
                             Screen.EditNote.route,
                             arguments = Screen.EditNote.navArguments
                         ) {
+                            val note = it.arguments?.getParcelable<NoteModel>(Constants.NOTE)
                             EditNoteComposable(
                                 onBackPressed = {
                                     popBackStack(
@@ -154,7 +165,8 @@ class SearchScreenActivity : BaseActivity() {
                                 }, onGalleryClick = {
                                     openGallery()
                                 },
-                                onRemovePhoto = {}
+                                onRemovePhoto = {},
+                                note = note ?: NoteModel()
                             )
                         }
                     }
@@ -196,14 +208,17 @@ class SearchScreenActivity : BaseActivity() {
     private fun savePhoto(uri: Uri?) {
         val photo = Photo(
             uri = uri.toString(),
+            id = Calendar.getInstance().timeInMillis,
         )
         viewModel.addPhoto(
             photo
         )
         viewModel.setPhotos(viewModel.photoList)
-        viewModel.updateNoteWithPhotos(photo = photo)
     }
-
+    private fun isDarkMode(): Boolean {
+        val dark = preferences.getSharedPreferencesInt(Constants.DARK)
+        return dark == Theme.DARK.value
+    }
 
     private fun popBackStack(navController: NavHostController, route: String) {
         navController.popBackStack(route = route, inclusive = false, saveState = true)

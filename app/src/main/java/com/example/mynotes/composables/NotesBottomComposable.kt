@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,12 +32,14 @@ fun NotesBottomComposable(
     onCreateNote: () -> Unit,
     onCameraClick: () -> Unit,
     onGalleryClick: () -> Unit,
-    imageVector: ImageVector
+    imageVector: ImageVector,
+    isFromTrash: Boolean = false
 ) {
     Surface(
         modifier = modifier
             .padding(10.dp)
-            .clip(RoundedCornerShape(30.dp)), color = notesTextColor
+            .clip(RoundedCornerShape(30.dp)),
+        color = MaterialTheme.colorScheme.secondary
     ) {
         Row(
             modifier = modifier
@@ -52,10 +55,10 @@ fun NotesBottomComposable(
 
             }
             NotesBottomItem(
-                imageVector = imageVector,
-                color = saveBtnColor,
-                tint = Color.White,
-                painterId = 0
+                imageVector = if (isFromTrash) null else imageVector,
+                color = MaterialTheme.colorScheme.surface,
+                tint = MaterialTheme.colorScheme.secondary,
+                painterId = if (isFromTrash) R.drawable.baseline_restore_24 else 0
             ) {
                 onCreateNote()
             }

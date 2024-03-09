@@ -1,15 +1,15 @@
 package com.example.mynotes.data
 
-import androidx.lifecycle.LiveData
 import com.example.mynotes.domain.AppRepository
-import com.example.mynotes.room.AppDao
+import com.example.mynotes.room.NotesDao
 import com.example.mynotes.room.NoteEntity
+import com.example.mynotes.room.TrashEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AppRepositoryImpl @Inject constructor(private val dao: AppDao) : AppRepository {
+class AppRepositoryImpl @Inject constructor(private val dao: NotesDao) : AppRepository {
     override fun fetchAllNotes(): Flow<List<NoteEntity>> {
         return dao.fetchAllNotes()
     }

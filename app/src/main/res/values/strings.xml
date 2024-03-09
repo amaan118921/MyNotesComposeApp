@@ -8,4 +8,14 @@
     <string name="edited">Edited</string>
     <string name="title_activity_search_screen">SearchScreenActivity</string>
     <string name="authorities">com.example.mynotes.fileprovider</string>
+    <string name="send">Send</string>
+    <string name="copy">Make a copy</string>
+    <string name="delete">Delete</string>
+    <string name="share_note">Share Note</string>
+    <string name="title_activity_trash">TrashActivity</string>
+    <string name="empty_trash">No notes in Trash</string>
+    <string name="delete_note">Are you sure, you want to delete this note?</string>
+    <string name="delete_note_from_trash">Are you sure, you want to delete this note permanently?</string>
+    <string name="restore">Restore</string>
+    <string name="restore_success">Note restored successfully</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,10 +23,10 @@ import com.example.mynotes.ui.theme.notesTextColorLight
 @Composable
 fun NotesBottomItem(
     modifier: Modifier = Modifier,
-    color: Color = antiFlashWhite,
+    color: Color = MaterialTheme.colorScheme.onPrimary,
     imageVector: ImageVector? = null,
     painterId: Int,
-    tint: Color = LocalContentColor.current,
+    tint: Color = MaterialTheme.colorScheme.secondary,
     onClick: () -> Unit
 ) {
     Surface(

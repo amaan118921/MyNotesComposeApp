@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.example.mynotes.R
 import com.example.mynotes.utils.getDateFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
