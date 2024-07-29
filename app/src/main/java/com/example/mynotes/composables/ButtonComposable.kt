@@ -1,23 +1,24 @@
 package com.example.mynotes.composables
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,6 +50,30 @@ fun ButtonComposable(modifier: Modifier = Modifier, imageVector: ImageVector, on
         }
     }
 }
+
+@Composable
+fun BtnComposable(modifier: Modifier = Modifier, imageVector: ImageVector, onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        colors = IconButtonDefaults.iconButtonColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = modifier
+            .border(BorderStroke(1.dp, notesTextColorLight), RoundedCornerShape(12.dp))
+
+    ) {
+        Icon(
+            tint = MaterialTheme.colorScheme.secondary,
+            imageVector = imageVector,
+            contentDescription = null,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BtnComposablePreview() {
+    BtnComposable(imageVector = Icons.Filled.ArrowBack, onClick = {})
+}
+
 
 @Preview(showBackground = true)
 @Composable

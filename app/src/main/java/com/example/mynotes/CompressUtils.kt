@@ -10,7 +10,6 @@ import com.example.mynotes.helper.CameraApi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 

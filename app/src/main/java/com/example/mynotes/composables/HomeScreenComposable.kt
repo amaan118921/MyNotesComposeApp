@@ -21,7 +21,6 @@ import com.example.mynotes.model.NoteModel
 @Composable
 fun HomeScreenComposable(
     modifier: Modifier = Modifier,
-    onSearchClick: (String) -> Unit,
     list: List<NoteModel>,
     onFabClick: () -> Unit,
     onItemClick: (NoteModel?) -> Unit,
@@ -49,7 +48,7 @@ fun HomeScreenComposable(
             Scaffold(
                 topBar = {
                     SearchBarComposable(
-                        onSearchClick = onSearchClick,
+                        onSearchClick = {},
                         enabled = enabled,
                         onClick = onClick,
                         onBack = {})
@@ -110,7 +109,6 @@ fun HomeScreenComposable(
 @Composable
 fun HomeScreenComposablePreview() {
     HomeScreenComposable(
-        onSearchClick = {},
         list = emptyList(),
         onFabClick = {},
         onItemClick = {},

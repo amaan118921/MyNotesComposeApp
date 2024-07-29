@@ -18,7 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mynotes.composables.EditNoteComposable
 import com.example.mynotes.composables.ImagePreviewComposable
 import com.example.mynotes.composables.TrashScreenComposable
-import com.example.mynotes.compose.Screen
+import com.example.mynotes.composenavigation.Screen
 import com.example.mynotes.enums.Theme
 import com.example.mynotes.model.NoteModel
 import com.example.mynotes.ui.theme.MyNotesTheme

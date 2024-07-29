@@ -77,7 +77,7 @@ fun CreateNoteComposable(
                     .padding(top = 16.dp, start = 8.dp, end = 8.dp)
                     .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ButtonComposable(imageVector = Icons.Default.KeyboardArrowLeft) {
+                BtnComposable(imageVector = Icons.Default.KeyboardArrowLeft) {
                     onBackPressed()
                 }
                 SaveButtonComposable(text = stringResource(id = R.string.save)) {
@@ -156,7 +156,6 @@ fun createNote(title: String, body: String, photosList: List<Photo>?): NoteModel
         body = body.trim(),
         time = getTime(),
         date = getDate(),
-        id = MainActivity.getRandomInt(),
         timestamp = Calendar.getInstance().timeInMillis,
         photoList = photosList
     )

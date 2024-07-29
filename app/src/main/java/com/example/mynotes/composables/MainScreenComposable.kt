@@ -16,7 +16,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -35,9 +39,6 @@ import java.util.Collections
 @Composable
 fun MainScreenComposable(
     modifier: Modifier = Modifier,
-    progressBar: Boolean,
-    updateProgressBar: (Boolean) -> Unit,
-    onSearch: (String) -> Unit,
     notesList: ResultState<List<NoteEntity>>?,
     navigateToCreateNote: () -> Unit,
     navigateToEditNote: (NoteModel?) -> Unit,
@@ -46,29 +47,33 @@ fun MainScreenComposable(
     onBottomSheetAction: (BottomSheetItems, NoteModel) -> Unit,
     onNoteDelete: () -> Unit,
     onTrashClick: () -> Unit,
-    onDarkModeClick: (Boolean) -> Unit,
     onPolicyClick: () -> Unit,
+    onDarkModeClick: (Boolean) -> Unit,
     darkMode: Boolean,
     drawerState: DrawerState
 ) {
 
     val scope = rememberCoroutineScope()
 
+    var showProgressBar by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.Red
     ) {
-        when (notesList) {
+        showProgressBar = when (notesList) {
             is ResultState.Success -> {
-                updateProgressBar(false)
+                false
             }
 
             is ResultState.Loading -> {
-                updateProgressBar(true)
+                true
             }
 
             else -> {
-                updateProgressBar(false)
+                false
             }
         }
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -118,9 +123,6 @@ fun MainScreenComposable(
             }) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     HomeScreenComposable(
-                        onSearchClick = {
-                            onSearch(it)
-                        },
                         list = getNotesList(notesList?.data) ?: emptyList(),
                         onFabClick = {
                             navigateToCreateNote()
@@ -128,7 +130,7 @@ fun MainScreenComposable(
                         onItemClick = {
                             navigateToEditNote(it)
                         },
-                        showProgressBar = progressBar,
+                        showProgressBar = showProgressBar,
                         enabled = false,
                         onClick = onClick,
                         onRefresh = onRefresh,

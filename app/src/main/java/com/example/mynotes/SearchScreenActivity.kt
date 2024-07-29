@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mynotes.composables.EditNoteComposable
 import com.example.mynotes.composables.ImagePreviewComposable
 import com.example.mynotes.composables.SearchScreenComposable
-import com.example.mynotes.compose.Screen
+import com.example.mynotes.composenavigation.Screen
 import com.example.mynotes.enums.Theme
 import com.example.mynotes.helper.CameraApi
 import com.example.mynotes.model.NoteModel
@@ -32,9 +32,7 @@ import com.example.mynotes.ui.theme.MyNotesTheme
 import com.example.mynotes.utils.Preferences
 import com.example.mynotes.utils.getUriEncoded
 import com.example.mynotes.viewModel.SearchViewModel
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

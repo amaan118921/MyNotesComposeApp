@@ -83,6 +83,8 @@ dependencies {
 
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    //eventbus
+    implementation("org.greenrobot:eventbus:3.3.1")
 
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")

@@ -1,4 +1,4 @@
-package com.example.mynotes.compose
+package com.example.mynotes.composenavigation
 
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType

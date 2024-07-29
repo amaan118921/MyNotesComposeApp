@@ -18,4 +18,5 @@
     <string name="delete_note_from_trash">Are you sure, you want to delete this note permanently?</string>
     <string name="restore">Restore</string>
     <string name="restore_success">Note restored successfully</string>
+    <string name="room_chucker">Room Chucker</string>
 </resources>
